@@ -29,15 +29,16 @@ ALL RIGHTS RESERVED
 /// @returns 0 if keys are equal, non-zero otherwise.
 /// @param key1 First key to compare.
 /// @param key2 Second key to compare.
-//{{{ porownanie
 template <class Key>
 inline int _compFunc(const Key& key1,const Key& key2)
+//{{{ porownanie
 {
     return (key1==key2);
 };//}}}
-//{{{ funkcja hashujaca
 template <class Key>
-inline unsigned hashF(const Key& k) {
+inline unsigned hashF(const Key& k)
+//{{{ funkcja hashujaca
+{
     int hash=0;
     for(int i=0; i<k.length(); i++)
         hash = 37*hash + k[i];
@@ -59,9 +60,10 @@ public:
     typedef std::pair<K,V> data_type;
     typedef unsigned size_type;
 //}}}
-//{{{ struct ListNode
-    class ListNode
+    class ListNode //AISDIHashMap
+//{{{ klasa ListNode
     {
+	public:
         typedef std::pair<K,V> T;
         ListNode* next;   ///< WskaŸnik na kolejny element na liœcie/pierœcieniu
         ListNode* prev;   ///< WskaŸnik na poprzedni element nal liœcie/pierœcieniu
@@ -83,16 +85,21 @@ public:
         }
     };
 //}}}
+    class Lista //AISDIHashMap 
 //{{{ klasa lista
-    class Lista
     {
     protected:
         ListNode *first;
     public:
-        Lista() {
+        Lista() //AISDIHashMap::Lista
+//{{{
+        {
             first = new ListNode(std::make_pair<K,V>());
         }
-        Lista(const Lista &org) {
+//}}}
+        Lista(const Lista &org)
+//{{{
+        {
             ListNode *temp;
             node = new ListNode(std::make_pair<K,V>());
             temp = org.first->next;
@@ -102,27 +109,39 @@ public:
                 temp = temp->next;
             }
         }
-        ~Lista() {
+//}}}
+        ~Lista() //AISDIHashMap::Lista
+//{{{
+        {
             clear();
             delete first;
         }
-        ListNode *insert(const data_type &ins) {
+//}}}
+        ListNode *insert(const data_type &ins) //AISDIHashMap::Lista
+//{{{
+        {
             ListNode *temp;
             temp = node->next;
-            while(temp != node) {
-                if(_compFunc(temp->data.first,ins.first)) {
+            while(temp != node)
+            {
+                if(_compFunc(temp->data.first,ins.first))
+                {
                     return temp;
                 }
             }
             unsafe_insert(ins);
             return node->prev;
         }
-        ListNode *unsafe_insert(const data_type &ins) {
+//}}}
+        ListNode *unsafe_insert(const data_type &ins) //AISDIHashMap::Lista
+//{{{
+        {
             new ListNode(ins,node,node->prev);
         }
-//{{{ const iterator dla listy
+//}}}
         class const_iterator : public std::iterator<std::forward_iterator_tag,
-            std::pair<K, V> >
+            std::pair<K, V> > //AISDIHashMap::Lista
+//{{{
         {
         public:
             typedef std::pair<K, V> T;
@@ -189,8 +208,8 @@ public:
             }
         };
 //}}}
-//{{{ iterator dla listy
-        class iterator : public const_iterator
+        class iterator : public const_iterator //AISDIHashMap::Lista
+//{{{
         {
             iterator(ListNode* x) : const_iterator(x) {}
             friend class Lista;
@@ -249,35 +268,78 @@ public:
             }
         };
 //}}}
-
+        iterator begin() //AISDIHashMap::Lista
+//{{{
+        {
+            return iterator(first->next);
+        }
+//}}}
+        iterator end() //AISDIHashMap::Lista
+//{{{
+        {
+            return iterator(first);
+        }
+//}}}
+        ListMap::iterator ListMap::find(const Key& k) //AISDIHashMap::Lista
+//{{{
+        {
+            ///@todo Zaimplementowaæ metod
+            iterator i = begin();
+            for(; i!=end(); i++) {
+                if(i->first == k)
+                    return i;
+            }
+            return i;
+        }
+//}}}
+        ListMap::const_iterator ListMap::find(const Key& k) const //AISDIHashMap::Lista
+//{{{
+        {
+            ///@todo Zaimplementowaæ metode
+            iterator i = begin();
+            for(; i!=end(); i++) {
+                if(i->first == k)
+                    return i;
+            }
+            return i;
+        }
+//}}}
     };
 //}}}
 private:
 //{{{ zmienne
-    Lista *tab[TABSIZE];
+    Liasta *tab[TABSIZE];
     size_type tabsize;
 //}}}
 public:
-//{{{ metody tabliy
-    AISDIHashMap() {
+    AISDIHashMap() 
+//{{{
+	{
         int i = 0;
         for(; i<TABSIZE; i++) {
             tab[i] = new Lista();
         }
         tabsize = 0;
     }
-    AISDIHashMap(const AISDIHashMap &org) {
+//}}}
+    AISDIHashMap(const AISDIHashMap &org) 
+//{{{
+	{
         int i = 0;
         tabsize = org.tabsize;
         for(; i<TABSIZE; i++) {
             tab[i] = new Lista(org.tab[i]);
         }
     }
-    ~AISDIHashMap() {
+//}}}
+    ~AISDIHashMap() 
+//{{{
+	{
         int i = 0;
         for(; i<TABSIZE; i++)
             delete tab[i];
     }
+//}}}
 
     /// Coping constructor.
     explicit AISDIHashMap(const AISDIHashMap<K, V, hashFunc, compFunc>& a);
@@ -286,7 +348,7 @@ public:
     //class const_iterator {};
     /// iterator.
     //class iterator {};
-	
+
 //}}}
 //{{{ iterator dla tablicy
     class iterator {
