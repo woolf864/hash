@@ -68,6 +68,7 @@ public:
         ListNode* next;   ///< WskaŸnik na kolejny element na liœcie/pierœcieniu
         ListNode* prev;   ///< WskaŸnik na poprzedni element nal liœcie/pierœcieniu
         T data;           ///< Dane
+		friend AISDIHashMap;
 //	   void* internalDataPointer;   ///< wskaŸnik pomocniczy
         ListNode(const std::pair<K,V>& d) : data(d)
         {
