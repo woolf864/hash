@@ -63,12 +63,12 @@ public:
     class ListNode //AISDIHashMap
 //{{{ klasa ListNode
     {
-	public:
+    public:
         typedef std::pair<K,V> T;
         ListNode* next;   ///< WskaŸnik na kolejny element na liœcie/pierœcieniu
         ListNode* prev;   ///< WskaŸnik na poprzedni element nal liœcie/pierœcieniu
         T data;           ///< Dane
-		friend AISDIHashMap;
+        friend class AISDIHashMap;
 //	   void* internalDataPointer;   ///< wskaŸnik pomocniczy
         ListNode(const std::pair<K,V>& d) : data(d)
         {
@@ -86,7 +86,7 @@ public:
         }
     };
 //}}}
-    class Lista //AISDIHashMap 
+    class Lista //AISDIHashMap
 //{{{ klasa lista
     {
     protected:
@@ -116,28 +116,6 @@ public:
         {
             clear();
             delete first;
-        }
-//}}}
-        ListNode *insert(const data_type &ins) //AISDIHashMap::Lista
-//{{{
-        {
-            ListNode *temp;
-            temp = node->next;
-            while(temp != node)
-            {
-                if(_compFunc(temp->data.first,ins.first))
-                {
-                    return temp;
-                }
-            }
-            unsafe_insert(ins);
-            return node->prev;
-        }
-//}}}
-        ListNode *unsafe_insert(const data_type &ins) //AISDIHashMap::Lista
-//{{{
-        {
-            new ListNode(ins,node,node->prev);
         }
 //}}}
         class const_iterator : public std::iterator<std::forward_iterator_tag,
@@ -269,9 +247,36 @@ public:
             }
         };
 //}}}
+        iterator insert(const data_type &ins) //AISDIHashMap::Lista
+//{{{
+        {
+            ListNode *temp;
+            temp = node->next;
+            while(temp != node)
+            {
+                if(_compFunc(temp->data.first,ins.first))
+                {
+                    return temp;
+                }
+            }
+            return unsafe_insert(ins);
+            //return iterator(node->prev);
+        }
+//}}}
+        iterator unsafe_insert(const data_type &ins) //AISDIHashMap::Lista
+//{{{
+        {
+            return iterator(new ListNode(ins,node,node->prev));
+        }
+//}}}
         iterator begin() //AISDIHashMap::Lista
 //{{{
         {
+            return iterator(first->next);
+        }
+		const_iterator begin() const
+        {
+            ///@todo Zaimplementowaæ metode
             return iterator(first->next);
         }
 //}}}
@@ -280,8 +285,13 @@ public:
         {
             return iterator(first);
         }
+        const_iterator end() const
+        {
+            ///@todo Zaimplementowaæ metode
+            return const_iterator(first);
+        }
 //}}}
-        ListMap::iterator ListMap::find(const Key& k) //AISDIHashMap::Lista
+        iterator find(const K& k) //AISDIHashMap::Lista
 //{{{
         {
             ///@todo Zaimplementowaæ metod
@@ -293,7 +303,7 @@ public:
             return i;
         }
 //}}}
-        ListMap::const_iterator ListMap::find(const Key& k) const //AISDIHashMap::Lista
+        const_iterator find(const K& k) const //AISDIHashMap::Lista
 //{{{
         {
             ///@todo Zaimplementowaæ metode
@@ -309,13 +319,13 @@ public:
 //}}}
 private:
 //{{{ zmienne
-    Liasta *tab[TABSIZE];
+    Lista *tab[TABSIZE];
     size_type tabsize;
 //}}}
 public:
-    AISDIHashMap() 
+    AISDIHashMap()
 //{{{
-	{
+    {
         int i = 0;
         for(; i<TABSIZE; i++) {
             tab[i] = new Lista();
@@ -323,9 +333,9 @@ public:
         tabsize = 0;
     }
 //}}}
-    AISDIHashMap(const AISDIHashMap &org) 
+    explicit AISDIHashMap(const AISDIHashMap &org)
 //{{{
-	{
+    {
         int i = 0;
         tabsize = org.tabsize;
         for(; i<TABSIZE; i++) {
@@ -333,9 +343,9 @@ public:
         }
     }
 //}}}
-    ~AISDIHashMap() 
+    ~AISDIHashMap()
 //{{{
-	{
+    {
         int i = 0;
         for(; i<TABSIZE; i++)
             delete tab[i];
@@ -343,7 +353,10 @@ public:
 //}}}
 
     /// Coping constructor.
-    explicit AISDIHashMap(const AISDIHashMap<K, V, hashFunc, compFunc>& a);
+    //explicit AISDIHashMap(const AISDIHashMap<K, V, hashFunc, compFunc>& a)
+    //{
+
+    //}
 
     /// const_iterator.
     //class const_iterator {};

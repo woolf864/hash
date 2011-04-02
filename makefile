@@ -1,7 +1,7 @@
 all : asd
 
 asd : asd.cc test.cc
-	g++ -O2 -D _SUNOS asd.cc test.cc /home/common/dyd/aisdi/hash/timer.cc -o asd 
+	clang++ -O2 asd.cc test.cc timer.cc -o asd 
 	
 del :
 	rm asd
